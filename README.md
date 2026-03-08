@@ -2,6 +2,8 @@
 
 # 割り勘計算機
 
+## デモページ: https://b13o.github.io/warikan-calculator/
+
 ## 概要
 
 このプロジェクトでは、割り勘アプリを構築します。  
