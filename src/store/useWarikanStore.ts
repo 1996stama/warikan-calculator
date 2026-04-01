@@ -34,6 +34,7 @@ const useWarikanStore = create<State & Action>((set) => ({
 
     //引数を任意の名(inputMember)で受け取り、inputMember(createで用意したstateの1つであるkey)に、その引数を入れて更新する(set)
     updateInputMember: (inputMember: string) => set(() => ({ inputMember: inputMember })),
+    //引数(新しくpaidByが入っているオブジェクト)を受け取り、Store内のinputExpenseを、その受け取ったオブジェクトで更新する
     updateInputExpense: (inputExpense: Expense) => set(() => ({ inputExpense: inputExpense })),
 
     addMember: () =>
@@ -61,22 +62,42 @@ const useWarikanStore = create<State & Action>((set) => ({
         }),
 
     addExpense: () =>
+        //state = ボタンを押したその瞬間の、Storeの中身が丸ごと入っている(inputMember含む)
+        //state.inputExpense : 今、画面に入力されている「誰が」「何を」「いくら」
+        //state.expenses : これまでに記録された支払いのリスト
+        //tate.members : 登録されているメンバーの一覧
         set((state) => {
+            //ボタンが押された時点の下記3点を分割代入で取得する = 今まさにStoreにある最新の入力データ
+            //「1文字打つたび」に Store は更新されているが、「最終的にユーザーが納得してボタンを押した時の完成データ」を確定させている
             const { paidBy, description, amount } = state.inputExpense;
+            //取り出した description の前後の空白を無くす
             const trimmedDescription = description.trim();
+            //.some() は「配列の中に、条件に合うやつが一つでもあるか？」を調査する「聞き込み調査員」のようなメソッド
+            //当てはまれば true, 無ければ false を返す
+            //現時点で既にStoreに存在している description が 先ほどつくった description.trim() と被っているか調査
             const isDuplicateDescription = state.expenses.some((expense) => expense.description === trimmedDescription);
+            //3つの値が存在し、新しい description(trimmedDescription)が既存の description と被っていなければ...
             if (paidBy && trimmedDescription && amount && !isDuplicateDescription) {
                 return {
+                    //現時点のexpenses配列を一度バラシ、inputExpenseオブジェクトを入れるが...
+                    //そのinputExpenseオブジェクトも一度バラし、先ほど取得した trimmedDescription を最新の description として格納し...
+                    //inputExpeseオブジェクトを作り直す そして、そのオブジェクトを expenses配列に格納する = 新しく expenses配列ができる
                     expenses: [...state.expenses, { ...state.inputExpense, description: trimmedDescription }],
+                    //値が留まらないよう、inputExpenseオブジェクトをリセットする
                     inputExpense: { paidBy: "", description: "", amount: 0 },
                 };
             }
+            //条件に当てはまらない場合は、現状の state を返す
             return state;
         }),
 
     removeExpense: (description: string) =>
         set((state) => {
             return {
+                //ボタンが押された瞬間の、今まさにStoreにある最新の入力データである expense配列を編集するよ
+                //その最新の一つ一つの description が 引数として受け取った description = 現状の配列に存在と等しくない...
+                //被っていない description だけを残し、set によって、expenses配列が新しく更新される
+                //.filter() は削除ではなく、選別
                 expenses: state.expenses.filter((expense) => expense.description !== description),
             };
         }),

@@ -71,8 +71,8 @@ const ExpenseList = (): JSX.Element => {
                         className="flex justify-between items-center p-2 bg-gray-50 rounded"
                     >
                         <span>
-                            {expense.paidBy}が{expense.description}で{expense.amount}
-                            円支払い
+                            {expense.paidBy}さんが{expense.description}で{expense.amount}
+                            円支払った
                         </span>
                         <Button onClick={() => removeExpense(expense.description)}>
                             <Trash2 className="w-4 h-4" />

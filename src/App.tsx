@@ -14,7 +14,7 @@ const App = (): JSX.Element => {
                     自動で最適な精算方法を算出します！
                 </p>
             </div>
-            <div>
+            <div className="flex justify-center space-x-8">
                 <MemberList />
                 <ExpenseList />
                 <Result />
